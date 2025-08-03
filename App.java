@@ -1,5 +1,15 @@
 public class App {
+    /* 
+    args:
+    [0]: file to encode name
+    [1]: file to write code
+    */
     public static void main(String[] args) {
-        Tree tree = new Tree();
+        if (args.length != 2) {
+            System.err.println("Error: uncorrect amount of arguments, please try again . . .");
+            System.exit(1);
+        }
+        System.out.println("\nCorrect launch!");
+        Encoder encoder = new Encoder(args[0], args[1]);
     }
 }
