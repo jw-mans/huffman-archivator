@@ -1,16 +1,25 @@
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 import java.util.*;
 
+import java.util.logging.Logger;
+
 public class Decoder {
+    private static final Logger logger = Logger.getLogger(Decoder.class.getName());
+
     private static class FileCodeReader {
         private static byte[] readFile(String filename) {
-            try (FileInputStream fis = new FileInputStream(filename)) { return fis.readAllBytes(); }
+            logger.info(String.format("Reading %s", filename));
+            try (FileInputStream fis = new FileInputStream(filename)) { 
+                logger.info(String.format("%s read", filename));
+                return fis.readAllBytes(); 
+            }
             catch(IOException ex) {
-                System.err.println("Error: unable to read code");
-                ex.printStackTrace();
+                logger.severe(String.format("Error, unable to read %s file: %s", filename, ex));
                 return null;
             }
         }
@@ -18,9 +27,13 @@ public class Decoder {
     private static class ByteDecoder {
         private static String makeString(String filename) {
             byte[] data = FileCodeReader.readFile(filename);
+            logger.info(String.format("Bytes from %s received.", filename));
+
             int index = 0;
             // number of unique symbols
             int uniqueCount = data[index++] & 0xFF;
+            logger.info("Counter received.");
+
             // code table
             Map<String, Character> decodeTable = new HashMap<>();
             for (int i = 0; i < uniqueCount; i++) {
@@ -41,6 +54,8 @@ public class Decoder {
                 String code = codeBits.substring(0, codeLength);
                 decodeTable.put(code, sym);
             }
+            logger.info("Codetable unpacked.");
+
             // padding bits
             int paddingBits = data[index++] & 0xFF;
             // read message by bits
@@ -57,6 +72,8 @@ public class Decoder {
             if (paddingBits > 0 && paddingBits <= 7) {
                 messageBits.setLength(messageBits.length() - paddingBits);
             }
+            logger.info("Message bits extracted.");
+            
             // table decoding 
             StringBuilder decoded = new StringBuilder();
             StringBuilder currentCode = new StringBuilder();
@@ -67,6 +84,8 @@ public class Decoder {
                     currentCode.setLength(0);
                 }
             }
+            logger.info("Message decoded.");
+
             return decoded.toString();
         }
     }
@@ -76,18 +95,18 @@ public class Decoder {
             String decoded = ByteDecoder.makeString(codeFn);
             try {
                 Files.writeString(Paths.get(outputFn), decoded);
+                logger.info(String.format("Decoded message written to %s.", outputFn));
             } catch (Exception ex) {
-                System.err.println("Error: unable to write file.");
-                ex.printStackTrace();
+                logger.severe(String.format("Error, unable to write %s file: %s", ex));
             }
         }
     }
     public static void decode(String codeFilename, String outputFilename) {
         try {
             Decompressor.decompress(codeFilename, outputFilename);
+            System.out.println(String.format("%s decompressed to %s", codeFilename, outputFilename));
         } catch (Exception ex) {
-            System.err.println("Error: Unable to decompress.");
-            ex.printStackTrace();
+            logger.severe(String.format("Error, unable to decompress %s file: %s", ex));
         }
     }
 }

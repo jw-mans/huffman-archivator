@@ -1,12 +1,16 @@
 # Compiled class file
 *.class
 
-# Log file
+# Log files
 *.log
 
-# Source Files
+# Config files
+*.config
+
+# Source files
 *.txt
 *.bin
+*.mp3
 
 # BlueJ files
 *.ctxt

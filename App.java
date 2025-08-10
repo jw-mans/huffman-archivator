@@ -1,16 +1,45 @@
+import java.io.IOException;
+import java.util.logging.*;
+
 public class App {
-    /* 
-    args:
-    [0]: file to encode name
-    [1]: file to write code
-    */
+
+    private static final Logger logger = Logger.getLogger(App.class.getName());
+
+    private static void setupLogging() {
+        Logger rootLogger = Logger.getLogger("");
+        rootLogger.setLevel(Level.ALL);
+        rootLogger.setUseParentHandlers(true);
+
+        try {
+            Handler fileHandler = new FileHandler("logs/debug.log", true);
+            fileHandler.setLevel(Level.ALL);
+            fileHandler.setFormatter(new SimpleFormatter());
+            rootLogger.addHandler(fileHandler);
+        } catch (IOException ex) {
+            System.err.println("Error: bad logging setup! " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * args:
+     * [0]: file to encode name
+     * [1]: file to write code
+     * [2]: file to write decoded text
+     */
     public static void main(String[] args) {
-        if (args.length != 3) {
-            System.err.println("Error: uncorrect amount of arguments, please try again . . .");
+        setupLogging();
+
+        if (args.length != 4) {
+            logger.severe("Incorrect arguments number. Excepted: 4.");
             System.exit(1);
         }
-        System.out.println("\nCorrect launch!");
+        logger.info("Remark. " + args[3]);
+        logger.info("Launch with " + String.join(", ", args) + " parameters");
+
         Encoder.encode(args[0], args[1]);
         Decoder.decode(args[1], args[2]);
+
+        logger.info("Program successfully completed.");
     }
 }
