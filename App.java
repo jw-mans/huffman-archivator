@@ -26,6 +26,7 @@ public class App {
      * [0]: file to encode name
      * [1]: file to write code
      * [2]: file to write decoded text
+     * [3]: some tag with '_' delimeters
      */
     public static void main(String[] args) {
         setupLogging();
