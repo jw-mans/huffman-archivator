@@ -10,6 +10,6 @@ public class App {
             System.exit(1);
         }
         System.out.println("\nCorrect launch!");
-        Encoder encoder = new Encoder(args[0], args[1]);
+        Encoder.encode(args[0], args[1]);
     }
 }

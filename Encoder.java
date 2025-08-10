@@ -5,62 +5,17 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Encoder {
-    private String initialMsg;
-    private Tree tree;
 
-    private String makeBinCode() {
-        StringBuilder encoded = new StringBuilder();
-        for (char c : initialMsg.toCharArray()) {
-            encoded.append(tree.codetable.get(c));
-        }
-        return encoded.toString();
-    }
-
-    private byte[] binarizeMsg() {
-        /*
-         * the structure:
-         * 1) [padding info (number of padding bits)] 
-         * 2) [1st byte] ... [nth byte (m.b. padded)]
-         */
-
-        String stringCode = makeBinCode();
-        // addition zeros for padding
-        int paddingBits = (8 - (stringCode.length() % 8)) % 8;
-        for (int i = 0; i < paddingBits; i++) 
-            stringCode += "0";
-
-        int byteCount = stringCode.length() / 8;
-        byte[] bytes = new byte[byteCount + 1]; // +1 for padding info
-        bytes[0] = (byte) paddingBits;
-
-        for (int i = 1; i < bytes.length; i++) {
-            String byteStr = stringCode.substring((i - 1) * 8, i * 8);
-            bytes[i] = (byte) Integer.parseInt(byteStr, 2);
-        }
-
-        return bytes;
-    }
-
-    private void makeBinFile(String codeFilename) {
-        byte[] bytes = binarizeMsg();
-        try(FileOutputStream fos = new FileOutputStream(codeFilename)) {
-            fos.write(bytes);
-            System.out.println("Encoded message written!");
-        } catch (IOException ex) {
-            System.err.println("Error: unable to written code!");
-            ex.printStackTrace();
-        }
-    }
-
-    public Encoder(String initialFilename, String codeFilename) {
-        try {
-            this.initialMsg = new String(Files.readAllBytes(Paths.get(initialFilename)));
-        } catch (IOException ex) {
-            System.err.println("Error: uncorrect file name."); 
-            ex.printStackTrace();
-        }
-        this.tree = new Tree(initialMsg);
-        makeBinFile(codeFilename);
+    private static class FileTextReader {
+        private static String readFile (String ifn) {
+            try {
+                return new String(Files.readAllBytes(Paths.get(ifn)));
+            } catch (IOException ex) {
+                System.err.println("Error: incorrect file name."); 
+                ex.printStackTrace();
+                return null;
+            }
+        } 
     }
 
     private static class Tree {
@@ -118,23 +73,23 @@ public class Encoder {
             private char c;
             private Node left, right;
 
-            public Node(int freq, char c) {
+            private Node(int freq, char c) {
                 this.freq = freq;
                 this.c = c;
                 this.left = null;
                 this.right = null;
             }
 
-            public Node(int freq) { this(freq, '\0'); }
+            private Node(int freq) { this(freq, '\0'); }
 
-            public int getFreq() { return freq; }
-            public char getChar() { return c; }
-            public Node getLeft() { return left; }
-            public Node getRight() { return right; }
+            private int getFreq() { return freq; }
+            private char getChar() { return c; }
+            private Node getLeft() { return left; }
+            private Node getRight() { return right; }
 
-            public boolean isLeaf() { return left == null && right == null; }
+            private boolean isLeaf() { return left == null && right == null; }
 
-            public void setChildren(Node left, Node right) {
+            private void setChildren(Node left, Node right) {
                 this.left = left;
                 this.right = right;
             }
@@ -143,5 +98,84 @@ public class Encoder {
         private static class NodeComparator implements Comparator<Node> {
             public int compare(Node l, Node r) { return Integer.compare(l.getFreq(), r.getFreq()); }
         } 
+    }
+
+    private static class ByteEncoder {
+        private static byte[] makeBytes(String initialFn) { 
+
+            String msg = FileTextReader.readFile(initialFn);
+
+            // making 0s n 1s code
+            StringBuilder encoded = new StringBuilder();
+            Tree tree = new Tree(msg);
+            for (char c : msg.toCharArray()) {
+                encoded.append(tree.codetable.get(c));
+            }
+            String stringCode = encoded.toString();
+            
+            // forming code table in bin
+            List<Byte> output = new ArrayList<>();
+            output.add((byte) tree.codetable.size());
+            for(Map.Entry<Character, String> entry : tree.codetable.entrySet()) {
+                char sym = entry.getKey();
+                String code = entry.getValue();
+                output.add((byte) sym); // symbol (1 byte)
+                output.add((byte) code.length()); // code length
+
+                while (code.length() % 8 != 0)
+                    code += "0"; // padding to byte
+                for (int i = 0; i < code.length(); i += 8) {
+                    String byteStr = code.substring(i, i + 8);
+                    output.add((byte) Integer.parseInt(byteStr, 2));
+                }
+            }
+
+            // padding and message
+            int paddingBits = (8 - (stringCode.length() % 8)) % 8; // addition zeros for padding
+            for (int i = 0; i < paddingBits; i++) 
+                stringCode += "0";
+            output.add((byte) paddingBits);
+            for (int i = 0; i < stringCode.length(); i+=8) {
+                String byteStr = stringCode.substring(i, i + 8);
+                output.add((byte) Integer.parseInt(byteStr, 2));
+            }
+
+            //making bytes array to write to .bin-file
+            /* the structure:
+            * 1) [number of unique symbols]
+            * 2) [1st symbol + code length + its code] ... [last symbol +code length + its code]
+            * 1) [padding info (number of padding bits)] 
+            * 2) [1st byte] ... [last byte (m.b. padded)]
+            */
+
+            byte[] bytes = new byte[output.size()];
+            for (int i = 0; i < output.size(); i++) {
+                bytes[i] = output.get(i);
+            }
+            return bytes;
+        }
+    }
+
+    private static class Compressor {
+        private static void compress(String initialFn, String compressedFn) {
+            byte[] bytes = ByteEncoder.makeBytes(initialFn);
+            
+            try(FileOutputStream fos = new FileOutputStream(compressedFn)) {
+                fos.write(bytes);
+                System.out.println("Encoded message written!");
+            } catch (IOException ex) {
+                System.err.println("Error: unable to write code!");
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public static void encode(String initialFilename, String codeFilename) {
+        try {
+            Compressor.compress(initialFilename, codeFilename);
+        } catch (Exception ex) {
+            System.err.println("Error: uncorrect file name."); 
+            ex.printStackTrace();
+        }
     }
 }
