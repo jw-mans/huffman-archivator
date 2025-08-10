@@ -12,10 +12,11 @@
    javac App.java
 3) Run the program with the following command, providing three arguments:
     ```bash 
-    java App [source_filename.txt] [compressed_filename] [decompressed_filename]
+    java App [source_filename.txt] [compressed_filename] [decompressed_filename] [tag]
 `[source_filename.txt]` — the text file to encode.  
 `[compressed_filename.bin]` — the file where the compressed data will be saved.  
 `[decompressed_filename.txt]` — the file where the decompressed data will be saved.
+`[tag]` — logger tag (with '_' delimiters).
 
 ---
 ## Code File Structure
