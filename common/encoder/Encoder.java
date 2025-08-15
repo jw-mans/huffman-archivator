@@ -1,8 +1,13 @@
+package common.encoder;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 import java.util.*;
+
 import java.util.logging.Logger;
 
 public class Encoder {
@@ -15,7 +20,7 @@ public class Encoder {
                 logger.info(String.format("Message from %s read.", ifn));
                 return initMessage;
             } catch (IOException ex) {
-                logger.severe(String.format("Error, unable to read %s: %s", ifn, ex));
+                logger.severe(String.format("Error, unable to read %s.", ifn));
                 return null;
             }
         } 
@@ -154,9 +159,9 @@ public class Encoder {
             logger.info(String.format("Bytes from %s maken.", initialFn));
             try(FileOutputStream fos = new FileOutputStream(compressedFn)) {
                 fos.write(bytes);
-                logger.info(String.format("Bytes written to %s", compressedFn));
+                logger.info(String.format("Bytes written to %s.", compressedFn));
             } catch (IOException ex) {
-                logger.severe(String.format("Error, unable to write code to %s: %s", compressedFn, ex));
+                logger.severe(String.format("Error, unable to write code to %s.", compressedFn));
             }
         }
     }
@@ -164,9 +169,10 @@ public class Encoder {
     public static void encode(String initialFilename, String codeFilename) {
         try {
             Compressor.compress(initialFilename, codeFilename);
-            logger.info(String.format("%s compressed to %s", initialFilename, codeFilename));
+            logger.info(String.format("%s compressed to %s.", initialFilename, codeFilename));
         } catch (Exception ex) {
-            logger.info(String.format("Error, unable to compress %s file: ex", initialFilename, ex));
+            logger.severe(String.format("Error, unable to compress %s file.", initialFilename));
+            ex.printStackTrace();
         }
     }
 }

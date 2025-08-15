@@ -7,17 +7,21 @@
 ## Program Launch
 
 1. Open the project in **VS Code** with the **Java Extension Pack** installed.
+
 2. Compile the main Java file by running:
    ```bash
-   javac App.java
-3) Run the program with the following command, providing three arguments:
-    ```bash 
-    java App [source_filename.txt] [compressed_filename] [decompressed_filename] [tag]
-`[source_filename.txt]` — the text file to encode.  
-`[compressed_filename.bin]` — the file where the compressed data will be saved.  
-`[decompressed_filename.txt]` — the file where the decompressed data will be saved.  
-`[tag]` — logger tag (with '_' delimiters).
+   javac Main.java  
+3) Start the program with the following command:
+    ```bash
+    java Main start  
+4) Select the operating mode by entering the keywords:  
+    - `exit` : exit aapplication
+    - `compress` : file compression mode
+    - `decompress` : file decompression mode  
 
+5) Run the process by typing following command:
+    ```text 
+    [source file (without spaces)] [target file (without spaces)] [logging tag]  
 ---
 ## Code File Structure
 The compressed file consists of the following parts:

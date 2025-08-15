@@ -1,3 +1,5 @@
+package common.decoder;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -13,13 +15,13 @@ public class Decoder {
 
     private static class FileCodeReader {
         private static byte[] readFile(String filename) {
-            logger.info(String.format("Reading %s", filename));
             try (FileInputStream fis = new FileInputStream(filename)) { 
-                logger.info(String.format("%s read", filename));
-                return fis.readAllBytes(); 
+                byte[] outputBytes = fis.readAllBytes(); 
+                logger.info(String.format("Bytes from %s read.", filename));
+                return outputBytes;
             }
             catch(IOException ex) {
-                logger.severe(String.format("Error, unable to read %s file: %s", filename, ex));
+                logger.severe(String.format("Error, unable to read %s file.", filename));
                 return null;
             }
         }
@@ -97,7 +99,7 @@ public class Decoder {
                 Files.writeString(Paths.get(outputFn), decoded);
                 logger.info(String.format("Decoded message written to %s.", outputFn));
             } catch (Exception ex) {
-                logger.severe(String.format("Error, unable to write %s file: %s", ex));
+                logger.severe(String.format("Error, unable to write %s file.", ex));
             }
         }
     }
@@ -106,7 +108,7 @@ public class Decoder {
             Decompressor.decompress(codeFilename, outputFilename);
             System.out.println(String.format("%s decompressed to %s", codeFilename, outputFilename));
         } catch (Exception ex) {
-            logger.severe(String.format("Error, unable to decompress %s file: %s", ex));
+            logger.severe(String.format("Error, unable to decompress %s file.", ex));
         }
     }
 }
