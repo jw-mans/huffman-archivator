@@ -1,65 +1,57 @@
 import java.util.Scanner;
-import common.decoder.*;
-import common.encoder.*;
+
+import com.src.encoder.Encoder;
+import com.src.Coder;
+import com.src.decoder.Decoder;
+
 import logs.AppLogger;
 
 public class Main {
+    private static final AppLogger logger = AppLogger.getLogger(Main.class);
+    private static Scanner scanner = new Scanner(System.in);
+
+    private static void exitProgram() {
+        logger.info("Program successfully completed.");
+        scanner.close();
+        System.exit(0);
+    }
+
+    private static void process(String mode) {
+        System.out.print("Enter: [source file (without spaces)], [target file (without spaces)], [tag]. ");
+        String line = scanner.nextLine().trim();
+        String[] inputData = line.split("\\s+");
+        if(inputData.length != 3) {
+            logger.info("Incorrect number of arguments. Expected: 3.");
+            return;
+        }
+        logger.info("REMARK." + inputData[2]);
+
+        logger.info(mode + " mode.");
+        Coder coder = new Encoder();
+        try {
+            if(mode.equals("Decompress"))
+                coder = new Decoder();
+            coder.code(inputData[0], inputData[1]);
+        } catch (Exception ex) {
+            logger.severe("Failed process!");
+        }
+    }
+
     public static void main(String[] args) {
-        AppLogger logger = AppLogger.getLogger(Main.class);
-        if (args.length != 1 || !args[0].equals("start")) {
-            logger.severe("Incorrect start message. Excepted: \'start\'.");
+        if (args.length != 0) {
+            logger.severe("Error: unexpected arguments.");
+            scanner.close();
             System.exit(1);
         }
-
-        Scanner scanner = new Scanner(System.in);
         String input;
 
         while (true) {
-            System.out.print("Select operation: \'compress\', \'decompress\', or \'exit\'. ");
+            System.out.print("Select operation: \'compress\', \'decompress\', or another to exit program. ");
             input = scanner.nextLine();
-
-            switch (input) {
-
-                case "exit": {
-                    logger.info("Program successfully completed.");
-                    scanner.close();
-                    System.exit(0);
-                }
-                case "compress": {
-                    logger.info("Encode mode.");
-                    System.out.print("Enter: [source file (without spaces)], [target file (without spaces)], [tag].");
-                    String line = scanner.nextLine().trim();
-                    String[] parts = line.split("\\s+");
-
-                    if (parts.length != 3) {
-                        logger.info("Incorrect number of arguments. Expected: 3.");
-                    } else {
-                        logger.info("Remark." + parts[2]);
-                        EncoderInterface eif = new ConsoleEncoder();
-                        eif.encode(parts[0], parts[1]);
-                    }
-                    break;
-                }
-                case "decompress": {
-                    logger.info("Decode mode");
-                    System.out.print("Enter: [source file (without spaces)], [target file (without spaces)], [tag]. ");
-                    String line = scanner.nextLine().trim();
-                    String[] parts = line.split("\\s+");
-
-                    if (parts.length != 3) {
-                        logger.info("Incorrect number of arguments. Expected: 3.");
-                    } else {
-                        logger.info("Remark." + parts[2]);
-                        DecoderInterface dif = new ConsoleDecoder();
-                        dif.decode(parts[0], parts[1]);
-                    }
-                    break;
-                }
-                default: {
-                    System.out.println("Bad Input. Try again . . .");
-                    logger.info("Bad input.");
-                    break;
-                }
+            switch(input) {
+                case "compress" -> process("Compress");
+                case "decompress" -> process("Decompress");
+                default -> exitProgram();
             }
         }
     }

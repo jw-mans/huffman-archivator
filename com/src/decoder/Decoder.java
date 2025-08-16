@@ -1,35 +1,21 @@
-package common.decoder;
-
-import java.io.FileInputStream;
-import java.io.IOException;
+package com.src.decoder;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import java.util.*;
 
-import java.util.logging.Logger;
+import com.src.Coder;
+import com.utils.AppReader;
 
-public class Decoder {
-    private static final Logger logger = Logger.getLogger(Decoder.class.getName());
+import logs.AppLogger;
 
-    private static class FileCodeReader {
-        private static byte[] readFile(String filename) {
-            try (FileInputStream fis = new FileInputStream(filename)) { 
-                byte[] outputBytes = fis.readAllBytes(); 
-                logger.info(String.format("Bytes from %s read.", filename));
-                return outputBytes;
-            }
-            catch(IOException ex) {
-                logger.severe(String.format("Error, unable to read %s file.", filename));
-                return null;
-            }
-        }
-    }
-    private static class ByteDecoder {
-        private static String makeString(String filename) {
-            byte[] data = FileCodeReader.readFile(filename);
-            logger.info(String.format("Bytes from %s received.", filename));
+public class Decoder extends Coder {
+    private static final AppLogger logger = AppLogger.getLogger(Decoder.class);
+
+    private static class Decompressor {
+        private static String mkstr(String sourceFilename) {
+            byte[] data = AppReader.readBytes(sourceFilename);
+            logger.info(String.format("Bytes from %s received.", sourceFilename));
 
             int index = 0;
             // number of unique symbols
@@ -90,25 +76,28 @@ public class Decoder {
 
             return decoded.toString();
         }
-    }
 
-    private static class Decompressor {
-        private static void decompress(String codeFn, String outputFn) {
-            String decoded = ByteDecoder.makeString(codeFn);
+        private static void decompress(String sourceFilename, String targetFilename) {
+            String decoded = mkstr(sourceFilename);
             try {
-                Files.writeString(Paths.get(outputFn), decoded);
-                logger.info(String.format("Decoded message written to %s.", outputFn));
+                Files.writeString(Paths.get(targetFilename), decoded);
+                logger.info(String.format("Message written to %s.", targetFilename));
             } catch (Exception ex) {
-                logger.severe(String.format("Error, unable to write %s file.", ex));
+                logger.severe(String.format("Error, unable to write message to %s.", ex));
             }
         }
     }
-    public static void decode(String codeFilename, String outputFilename) {
+
+    @Override
+    public void code(String sourceFilename, String targetFilename) {
         try {
-            Decompressor.decompress(codeFilename, outputFilename);
-            System.out.println(String.format("%s decompressed to %s", codeFilename, outputFilename));
+            Decompressor.decompress(sourceFilename, targetFilename);
+            logger.info(String.format("%s decompressed into %s", sourceFilename, targetFilename));
         } catch (Exception ex) {
-            logger.severe(String.format("Error, unable to decompress %s file.", ex));
+            logger.severe(String.format("Error, unable to decompress %s.", sourceFilename));
         }
+    }
+    public static void decode(String sourceFilename, String targetFilename) {
+        new Decoder().code(sourceFilename, targetFilename);
     }
 }
