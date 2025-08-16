@@ -15,9 +15,9 @@
     ```bash
     java Main start  
 4) Select the operating mode by entering the keywords:  
-    - `exit` : exit aapplication
-    - `compress` : file compression mode
-    - `decompress` : file decompression mode  
+    - `compress` : file compression mode;
+    - `decompress` : file decompression mode;  
+    - another string to exit program.
 
 5) Run the process by typing following command:
     ```text 
