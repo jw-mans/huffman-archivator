@@ -16,6 +16,12 @@ public final class AppLogger {
         Logger rootLogger = Logger.getLogger("");
         rootLogger.setLevel(Level.ALL);
 
+        //disable unwanted console handler
+        Handler[] activeHandlers = rootLogger.getHandlers();
+        for(Handler handler : activeHandlers) {
+            if(handler instanceof ConsoleHandler) rootLogger.removeHandler(handler);
+        }
+
         try {
             Handler fileHandler = new FileHandler("logs/debug.log", true);
             fileHandler.setLevel(Level.ALL);

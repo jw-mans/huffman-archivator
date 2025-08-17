@@ -1,7 +1,7 @@
 package com.src.encoder;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import com.src.Coder;
@@ -15,25 +15,29 @@ public class Encoder extends Coder {
 
     private static class Compressor {
         private static byte[] mkbytes(String sourceFilename) {
-            String msg = AppReader.readFile(sourceFilename);
-            logger.info("Message read.");
+            //String msg = AppReader.readFile(sourceFilename);
+            //logger.info("Message read.");
+            byte[] data = AppReader.readBytes(sourceFilename); 
+            logger.info("File read as bytes.");
 
             // making 0s n 1s code
             StringBuilder encoded = new StringBuilder();
-            Map<Character, String> codetable = HuffmanTree.getCodesMap(msg);
-            for (char c : msg.toCharArray()) {
-                encoded.append(codetable.get(c));
-            }
+            //Map<Character, String> codetable = HuffmanTree.getCodesMap(msg);
+            //for (char c : msg.toCharArray()) {
+            //    encoded.append(codetable.get(c));
+            //}
+            Map <Byte, String> codetable = HuffmanTree.getCodesMap(data);
+            for(byte b : data) encoded.append(codetable.get(b));
             String stringCode = encoded.toString();
             logger.info("0s & 1s code generated.");
 
             // forming code table in bin
             List<Byte> output = new ArrayList<>();
             output.add((byte) codetable.size());
-            for(Map.Entry<Character, String> entry : codetable.entrySet()) {
-                char sym = entry.getKey();
+            for(Map.Entry<Byte, String> entry : codetable.entrySet()) {
+                Byte oneByte = entry.getKey();
                 String code = entry.getValue();
-                output.add((byte) sym); // symbol (1 byte)
+                output.add((byte) oneByte); // symbol (1 byte)
                 output.add((byte) code.length()); // code length
 
                 while (code.length() % 8 != 0)
@@ -73,13 +77,12 @@ public class Encoder extends Coder {
         }
 
         private static void compress(String sourceFilename, String targetFilename) {
-            byte[] bytes = mkbytes(sourceFilename);
-            logger.info(String.format("Bytes from %s maken.", sourceFilename));
-            try(FileOutputStream fos = new FileOutputStream(targetFilename)) {
-                fos.write(bytes);
-                logger.info(String.format("Bytes written to %s.", targetFilename));
-            } catch (IOException ex) {
-                logger.severe(String.format("Error, unable to write code to %s.", targetFilename));
+            byte[] data = mkbytes(sourceFilename);
+            try {
+                Files.write(Paths.get(targetFilename), data);
+                logger.info(String.format("Message written to %s.", targetFilename));
+            } catch (Exception ex) {
+                logger.severe(String.format("Error, unable to write message to %s.", ex));
             }
         }
     }

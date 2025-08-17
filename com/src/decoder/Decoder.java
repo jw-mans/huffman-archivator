@@ -13,7 +13,7 @@ public class Decoder extends Coder {
     private static final AppLogger logger = AppLogger.getLogger(Decoder.class);
 
     private static class Decompressor {
-        private static String mkstr(String sourceFilename) {
+        private static byte[] mkbytes(String sourceFilename) {
             byte[] data = AppReader.readBytes(sourceFilename);
             logger.info(String.format("Bytes from %s received.", sourceFilename));
 
@@ -23,7 +23,7 @@ public class Decoder extends Coder {
             logger.info("Counter received.");
 
             // code table
-            Map<String, Character> decodeTable = new HashMap<>();
+            Map<String, Byte> decodeTable = new HashMap<>();
             for (int i = 0; i < uniqueCount; i++) {
                 char sym = (char) (data[index++] & 0xFF);
                 int codeLength = data[index++] & 0xFF;
@@ -40,7 +40,7 @@ public class Decoder extends Coder {
                 }
                 //cutting 
                 String code = codeBits.substring(0, codeLength);
-                decodeTable.put(code, sym);
+                decodeTable.put(code, (byte) sym);
             }
             logger.info("Codetable unpacked.");
 
@@ -63,24 +63,28 @@ public class Decoder extends Coder {
             logger.info("Message bits extracted.");
             
             // table decoding 
-            StringBuilder decoded = new StringBuilder();
+            List<Byte> decoded = new ArrayList<>();
             StringBuilder currentCode = new StringBuilder();
             for (char bit : messageBits.toString().toCharArray()) {
                 currentCode.append(bit);
                 if (decodeTable.containsKey(currentCode.toString())) {
-                    decoded.append(decodeTable.get(currentCode.toString()));
+                    decoded.add(decodeTable.get(currentCode.toString()));
                     currentCode.setLength(0);
                 }
             }
             logger.info("Message decoded.");
 
-            return decoded.toString();
+            byte[] res = new byte[decoded.size()];
+            for(int i = 0; i < decoded.size(); i++)
+                res[i] = decoded.get(i);
+            logger.info("Bytes maken.");
+            return res;
         }
 
         private static void decompress(String sourceFilename, String targetFilename) {
-            String decoded = mkstr(sourceFilename);
+            byte[] data = mkbytes(sourceFilename);
             try {
-                Files.writeString(Paths.get(targetFilename), decoded);
+                Files.write(Paths.get(targetFilename), data);
                 logger.info(String.format("Message written to %s.", targetFilename));
             } catch (Exception ex) {
                 logger.severe(String.format("Error, unable to write message to %s.", ex));
