@@ -21,7 +21,7 @@
 
 5) Run the process by typing following command:
     ```text 
-    [source file (without spaces)] [target file (without spaces)] [logging tag]  
+    [source file (without spaces)] [target file (without spaces)]
 ---
 ## Code File Structure
 The compressed file consists of the following parts:

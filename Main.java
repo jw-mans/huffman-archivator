@@ -3,8 +3,7 @@ import java.util.Scanner;
 import com.src.Coder;
 import com.src.decoder.Decoder;
 import com.src.encoder.Encoder;
-
-import com.utils.SizeComparator;
+import com.utils.files.SizeComparator;
 
 import logs.AppLogger;
 

@@ -1,6 +1,4 @@
-package com.utils;
-
-import java.nio.charset.StandardCharsets;
+package com.utils.files;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -18,11 +16,6 @@ public class AppReader {
             logger.severe(String.format("Error, unable to read %s", sourceFilename));
             return null;
         }
-    }
-
-    public static String readFile(String sourceFilename) {
-        byte[] data = executeRead(sourceFilename, false);
-        return data != null ? new String(data, StandardCharsets.UTF_8) : null;
     }
 
     public static byte[] readBytes(String sourceFilename) {

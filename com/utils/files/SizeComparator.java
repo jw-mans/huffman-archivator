@@ -1,4 +1,4 @@
-package com.utils;
+package com.utils.files;
 
 import java.nio.file.Path;
 

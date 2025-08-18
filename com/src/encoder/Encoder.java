@@ -1,12 +1,11 @@
 package com.src.encoder;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 import com.src.Coder;
 import com.src.encoder.alg.HuffmanTree;
-import com.utils.AppReader;
+import com.utils.files.AppReader;
+import com.utils.files.AppWriter;
 
 import logs.AppLogger;
 
@@ -78,12 +77,7 @@ public class Encoder extends Coder {
 
         private static void compress(String sourceFilename, String targetFilename) {
             byte[] data = mkbytes(sourceFilename);
-            try {
-                Files.write(Paths.get(targetFilename), data);
-                logger.info(String.format("Message written to %s.", targetFilename));
-            } catch (Exception ex) {
-                logger.severe(String.format("Error, unable to write message to %s.", ex));
-            }
+            AppWriter.writeFile(data, targetFilename);
         }
     }
 
