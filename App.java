@@ -19,8 +19,14 @@ public class App {
 
         // -------- Main Scene --------
 
-        Panel mainScene = new Panel(new GridLayout(3, 1, 0, 20));
+        Panel mainScene = new Panel(new BorderLayout(0, 20));
+        
+        // title 
+        Label title = new Label("Optimal Compressor", Label.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 24));
+        mainScene.add(title, BorderLayout.NORTH);
 
+        Panel btnPanel = new Panel(new GridLayout(3, 1, 0, 10));
         AppButton btnCompress = new AppButton("Compress file", e -> {
             cl.show(root, "compressScene");
         });
@@ -32,9 +38,13 @@ public class App {
             System.exit(0);
         });
 
-        mainScene.add(btnCompress);
-        mainScene.add(btnDecompress);
-        mainScene.add(btnExit);
+        btnPanel.add(btnCompress);
+        btnPanel.add(btnDecompress);
+        btnPanel.add(btnExit);
+
+        Panel flowWrapper = new Panel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        flowWrapper.add(btnPanel);
+        mainScene.add(flowWrapper, BorderLayout.CENTER);
 
         // ------ Compress Scene ------
         AppProcessPanel compressScene = new AppProcessPanel(

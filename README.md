@@ -1,45 +1,38 @@
 # Huffman Archivator
 
-**Console application** for encoding and decoding files using the **Huffman algorithm**.
+**GUI application** for encoding and decoding files using the **Huffman algorithm**.  
+Now distributed as a ready-to-use **Windows executable (.exe)**.
 
 ---
 
 ## Program Launch
 
-1. Open the project in **VS Code** with the **Java Extension Pack** installed.
+1. Double-click `HuffmanArchivator.exe` to start the program.  
 
-2. Compile the main Java file by running:
-   ```bash
-   javac Main.java  
-3) Start the program with the following command:
-    ```bash
-    java Main start  
-4) Select the operating mode by entering the keywords:  
-    - `compress` : file compression mode;
-    - `decompress` : file decompression mode;  
-    - another string to exit program.
+2. Use the GUI window to:  
+   - Select **Compress** to encode a file (`input.txt` → `input.txt.huf`).  
+   - Select **Decompress** to decode a file (`input.txt.huf` → `input.txt`).  
 
-5) Run the process by typing following command:
-    ```text 
-    [source file (without spaces)] [target file (without spaces)]
+**File restrictions:**
+- Files ending with `.huf` **cannot be compressed**.  
+- Only files ending with `.huf` **can be decompressed**.  
+- Other files will be rejected with an error message.  
+
 ---
-## Code File Structure
-The compressed file consists of the following parts:
 
-1) **Number of unique symbols**
-An integer representing how many unique characters are encoded.
+## File Format
 
-2) **Symbols and their codes**
-For each unique symbol, the following information is stored:
+The `.huf` file consists of:
 
-    - The symbol itself
+1) **Number of unique symbols** – integer count of unique characters.  
+2) **Symbols and their codes** – for each symbol: symbol, length of Huffman code, and code itself.  
+3) **Padding information** – number of padding bits at the end.  
+4) **Encoded data bytes** – compressed data stream (with possible padding).  
 
-    - The length of its Huffman code
+---
 
-    - The Huffman code (binary sequence)
+## License
 
-3) **Padding information**  
-The number of padding bits added at the end to complete the last byte.
+Distributed under the MIT License. See LICENSE.txt for details.
 
-4) **Encoded data bytes**  
-The actual compressed data stream, byte by byte (with possible padding in the last byte).
+---
