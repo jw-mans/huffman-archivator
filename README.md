@@ -33,6 +33,6 @@ The `.huf` file consists of:
 
 ## License
 
-Distributed under the MIT License. See LICENSE.txt for details.
+Distributed under the MIT License. See LICENSE for details.
 
 ---
